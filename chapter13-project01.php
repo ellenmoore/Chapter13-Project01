@@ -1,6 +1,5 @@
 <?php
 
-
 // initialize variables
 $email = "";
 $password = "";
@@ -16,7 +15,21 @@ $emailClass = '';
 
 $passwordMessage = '';
 $passwordClass = '';
-   
+  
+function validLogin(){
+$pdo = new PDO(DBCONNSTRING,DBUSER,DBPASS);
+//very simple (and insecure) check of valuid credentials.
+$sql = "SELECT * FROM Credentials WHERE Username=:user and
+Password=:pass";
+$statement = $pdo->prepare($sql);
+$statement->bindValue(':user',$_POST['username']);
+$statement->bindValue(':pass',$_POST['pword']);
+$statement->execute();
+if($statement->rowCount()>0){
+return true;
+}
+return false;
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,6 +60,24 @@ $passwordClass = '';
       </div>
       <div class="col-md-6">
          <div id="login">
+<?php
+   //require_once("config.php");
+   $loggedIn=false;
+   
+   if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     if(validLogin()){
+		echo "Welcome ".$_POST['username'];
+		$loggedIn=true;
+	}
+	else{
+		echo "login unsuccessful";
+	}
+   }
+   else{
+     echo "No Post detected";
+   } 
+   
+?>
 
             <div class="page-header">
                <h2>Login</h2> 
