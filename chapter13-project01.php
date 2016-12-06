@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+require_once('config2.php');
+$connection = mysqli_connect(DBHOST, DBUSER, DBPASS, DBNAME);
+
+//handling connection errors
+if (mysqli_connect_errno()) {
+	die(mysqli_connect_error());
+}
 
 // initialize variables
 $email = "";
@@ -22,8 +31,8 @@ $pdo = new PDO(DBCONNSTRING,DBUSER,DBPASS);
 $sql = "SELECT * FROM Credentials WHERE Username=:user and
 Password=:pass";
 $statement = $pdo->prepare($sql);
-$statement->bindValue(':user',$_POST['username']);
-$statement->bindValue(':pass',$_POST['pword']);
+$statement->bindValue(':user',$_POST['email']);
+$statement->bindValue(':pass',$_POST['password']);
 $statement->execute();
 if($statement->rowCount()>0){
 return true;
@@ -66,45 +75,74 @@ return false;
    
    if ($_SERVER["REQUEST_METHOD"] == "POST") {
      if(validLogin()){
-		echo "Welcome ".$_POST['username'];
+		echo "<h2>Welcome ".$_POST['email']."</h2>";
+		echo "<a href='logout.php'>Logout</a>";
+		$_SESSION['UserID']=$email;
 		$loggedIn=true;
 	}
-	else{
-		echo "login unsuccessful";
-	}
+	else {
+		echo '<p>Login unsuccessful.</p>';
+		echo '<div class="page-header">
+               <h2>Login</h2> 
+            </div>';
+       echo '<form role="form" method="post" action="' .$_SERVER['PHP_SELF']. '">';
+      echo    '<div class="form-group '.$emailClass.'">';
+      echo      '<label for="exampleInputEmail1">Email address</label>';
+       echo     '<input type="email" class="form-control" name="email" value="'.$email.'">';
+       echo     '<p class="help-block">'.$emailMessage.'</p>';
+        echo  '</div>
+              <div class="form-group '.$passwordClass.'">';
+        echo    '<label for="exampleInputPassword1">Password</label>';
+        echo    '<input type="password" class="form-control" name="password"  value="'.$password.'>';
+        echo   '<p class="help-block">'.$passwordMessage.'</p>';
+        echo  '</div>
+              <div class="form-group">
+                <label for="exampleInputFile">Server</label>
+                <select name="server" class="form-control">';
+                
+                  for ($i = 1; $i < 6; $i++) {
+                     echo '<option>Server ' . $i . '</option>';
+                  }
+                
+       echo     '</select>';             
+        echo      '</div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>  ';
+   } 
+
    }
    else{
-     echo "No Post detected";
+     echo '<div class="page-header">
+               <h2>Login</h2> 
+            </div>';
+       echo '<form role="form" method="post" action="' .$_SERVER['PHP_SELF']. '">';
+      echo    '<div class="form-group '.$emailClass.'">';
+      echo      '<label for="exampleInputEmail1">Email address</label>';
+       echo     '<input type="email" class="form-control" name="email" value="'.$email.'">';
+       echo     '<p class="help-block">'.$emailMessage.'</p>';
+        echo  '</div>
+              <div class="form-group '.$passwordClass.'">';
+        echo    '<label for="exampleInputPassword1">Password</label>';
+        echo    '<input type="password" class="form-control" name="password"  value="'.$password.'>';
+        echo   '<p class="help-block">'.$passwordMessage.'</p>';
+        echo  '</div>
+              <div class="form-group">
+                <label for="exampleInputFile">Server</label>
+                <select name="server" class="form-control">';
+                
+                  for ($i = 1; $i < 6; $i++) {
+                     echo '<option>Server ' . $i . '</option>';
+                  }
+                
+       echo     '</select>';             
+        echo      '</div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>  ';
    } 
    
 ?>
 
-            <div class="page-header">
-               <h2>Login</h2> 
-            </div>
-            <form role="form" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-              <div class="form-group <?php echo $emailClass; ?>">
-                <label for="exampleInputEmail1">Email address</label>
-                <input type="email" class="form-control" name="email" value="<?php echo $email; ?>">
-                <p class="help-block"><?php echo $emailMessage; ?></p>
-              </div>
-              <div class="form-group <?php echo $passwordClass; ?>">
-                <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" name="password"  value="<?php echo $password; ?>>
-                <p class="help-block"><?php echo $passwordMessage; ?></p>
-              </div>
-              <div class="form-group">
-                <label for="exampleInputFile">Server</label>
-                <select name="server" class="form-control">
-                <?php
-                  for ($i = 1; $i < 6; $i++) {
-                     echo '<option>Server ' . $i . '</option>';
-                  }
-                ?>
-                </select>             
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>  
+            
 
          </div>
       </div>
